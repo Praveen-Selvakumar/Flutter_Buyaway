@@ -9,6 +9,11 @@ import 'package:ui_demo_1/common/CustomTextButton.dart';
 import 'package:ui_demo_1/common/UserLocalStore.dart';
 import 'package:ui_demo_1/login_frame/login_page.dart';
 import 'package:ui_demo_1/mainframe/home_page.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'dart:convert';
+
 
 
 
@@ -17,9 +22,9 @@ class register_page extends StatefulWidget{
   State<StatefulWidget> createState()  => register_page_();
 }
 
-class register_page_  extends State<register_page>{
+ 
 
-       
+class register_page_  extends State<register_page>{       
 
        //CONTROLLERS
        final get_name  = new TextEditingController();
@@ -31,7 +36,6 @@ class register_page_  extends State<register_page>{
 
       Color btn_clr = Color(0xff1a95d1);
       GlobalKey<FormState> formkey = new GlobalKey();
-
       bool _obscureText = true;
       
 
@@ -40,7 +44,7 @@ class register_page_  extends State<register_page>{
              setState(() {
              _obscureText = !_obscureText;
     });
-  }      
+  }     
 
   
 
@@ -198,23 +202,8 @@ Widget getPasswordField(String str,String error,TextEditingController controller
 
 
   void validate_final(){
-      if(password_con.text.contains(conf_password_con.text)){
-       
-        //Store Data
-       /* UserLocalStore.StoreUserData(new TotalModel(0, get_name.text , 
-        get_email.text, get_number.text,
-        "", conf_password_con.text , get_gender.text ));*/
-
-          //Show Data
-          String name = UserLocalStore.getStoredData("name") ;  
-          print(name);
-          Fluttertoast.showToast(msg: "Something written here :"+name);  
-       
-        /*Fluttertoast.showToast(msg:' Registered Sucessfully');
-          Navigator.push(context, 
-          MaterialPageRoute(builder: (context) => login_page() )); */
-
-                     
+      if(password_con.text.contains(conf_password_con.text)){ 
+                            
                  
       }else{        
         Fluttertoast.showToast(msg: ' Passwords should be same');
@@ -222,11 +211,7 @@ Widget getPasswordField(String str,String error,TextEditingController controller
   }
 
    
-  StoreUserData(String number) async {
-   SharedPreferences preferences = await SharedPreferences.getInstance();
-   preferences.setString("number",number);
-   preferences.commit();
-  }
+  
 
 
    

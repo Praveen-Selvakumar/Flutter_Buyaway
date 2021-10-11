@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 class TotalModel {
    
+  
     
   final String id; 
   final String name ;

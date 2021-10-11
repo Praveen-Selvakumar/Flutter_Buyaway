@@ -1,3 +1,8 @@
+import 'dart:async';
+import 'dart:async';
+import 'dart:core';
+import 'dart:core';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +14,10 @@ import 'package:ui_demo_1/login_frame/forgot_password.dart';
 import 'package:ui_demo_1/login_frame/register_page.dart';
 import 'package:ui_demo_1/main.dart';
 import 'package:ui_demo_1/mainframe/home_page.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'dart:convert';
 
 
 class login_page extends StatefulWidget{
@@ -16,16 +25,43 @@ class login_page extends StatefulWidget{
   State<StatefulWidget> createState() => login_page_();  
 }
 
+Future<UserModel>  load_login(String number, String pwd) async{
+
+  final String apiUrl = "http://webbuyaway.buyaway.in/api/APIMobileAccount/UserLogin";
+
+  final response = await http.post(Uri.parse(apiUrl), body: {
+     "contact_number" : number,
+     "password" : pwd
+  });
+
+      Map<String, dynamic> data = new Map<String, dynamic>.from(json.decode(response.body));
+     UserModel model = new UserModel( data['status'],data['message'] , 
+                               data['user_check'] ,data['contact_number'] );
+      return model;              
+}
+
+
 class login_page_ extends State<login_page>{  
 
-       //CONTROLLER FOR TEXTFORM_FIELD
-       final get_number_ = new TextEditingController();
-       final get_password_ = new TextEditingController();
-        
+     
 
       Color btn_clr = Color(0xff1a95d1);
       GlobalKey<FormState> formkey = new GlobalKey();
+       //CONTROLLER FOR TEXTFORM_FIELD
+       final get_number_ = new TextEditingController();
+
+       final get_password_ = new TextEditingController();
+       //DECLARE MODEL CLASS
+       UserModel model_cl = new UserModel( "", "", "", "");
+
       bool _obscureText = true;
+
+         @override
+         void initState()
+         {
+          super.initState();
+          isUserLogged();              
+         }  
 
        //PASSWORD VISIBILITY
        void _togglePasswordStatus() {
@@ -33,13 +69,6 @@ class login_page_ extends State<login_page>{
              _obscureText = !_obscureText;
     });
   }       
-        
-         @override
-         void initState()
-         {
-          super.initState();
-          isUserLogged();              
-         }  
 
   void StoreData(String number_) async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -51,11 +80,18 @@ class login_page_ extends State<login_page>{
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String  getNumber = preferences.getString("number").toString();
       if(getNumber != null ){
-        Fluttertoast.showToast(msg: getNumber);
-          //pushToHome();
+         pushToHome(getNumber);
       }
   }     
 
+   void pushToHome(String contact_number){
+     StoreData(contact_number);   
+     Navigator.push(context, (MaterialPageRoute(
+       builder: (context) =>  btm_app_bar()
+       ) ));
+        get_number_.text = "";
+        get_password_.text = "";
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -124,10 +160,16 @@ class login_page_ extends State<login_page>{
                            width: double.infinity,
                            child: Container(
                              child: ElevatedButton(
-                               onPressed: (){  
-                                   StoreData(get_number_.text);
-                                   if(formkey.currentState!.validate()){                                       
-                                       pushToHome();
+                               onPressed: () async {                                     
+                                   if(formkey.currentState!.validate()){   
+                                        UserModel? model = await load_login(get_number_.text,get_password_.text);  
+                                        if(model != null ){
+                                           model_cl = model ;
+                                           if(model_cl.status.contains("Success")){
+                                                pushToHome(model.contact_number);
+                                                Fluttertoast.showToast(msg: "Logged in SuccesFully");
+                                             } 
+                                         }                                    
                                        }else{
                                       Fluttertoast.showToast(msg: "Something gone wrong..!");
                                     }  
@@ -164,14 +206,19 @@ class login_page_ extends State<login_page>{
           ),
        );
   }
- 
-  
-
-   void pushToHome( ){
-     Navigator.push(context, (MaterialPageRoute(
-       builder: (context) =>  btm_app_bar()
-       ) ));
-   }
-  
-   
 }
+
+ 
+class UserModel {
+     UserModel(
+       this.status,
+       this.message,
+       this.user_check,
+       this.contact_number
+     );
+
+      String contact_number ;
+      String message ;
+      String status ; 
+      String user_check ;
+} 

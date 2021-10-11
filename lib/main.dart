@@ -7,6 +7,7 @@ import 'package:ui_demo_1/login_frame/register_page.dart';
 import 'package:ui_demo_1/mainframe/home_page.dart';
 import 'package:ui_demo_1/mainframe/offers_page.dart';
 import 'package:ui_demo_1/mainframe/search_page.dart';
+import 'package:ui_demo_1/test_pack/ExpandAnimation.dart';
 import 'package:ui_demo_1/test_pack/temp.dart';
 import 'package:ui_demo_1/test_pack/test.dart';
 import 'package:ui_demo_1/test_pack/test_ui.dart';
@@ -29,12 +30,7 @@ void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     title: "Buyaway",
-    home: test_ui(),
+    home: Load_Brands(),    
    ));
 }
-
-
-
- 
-
  
